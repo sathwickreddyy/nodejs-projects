@@ -1,22 +1,65 @@
 const express = require("express");
 const connectDB = require("./config/database");
+const { validateSignUpData } = require("./utils/validation");
 const User = require("./models/user");
+const bcrpt = require("bcrypt");
 
 const app = express();
 
 app.use(express.json());
 
 app.post("/signup", async (req, res) => {
-    // Create a new instance of user model
-    const user = new User(req.body);
-    await user.save().then((user) => {
-        console.log("User saved successfully");
-        res.send(user);
-    }).catch((err) => {
-        console.error("Error while saving user", err);
+    try {
+        // Validate the request body
+        validateSignUpData(req);
+
+        const { password, firstName, lastName, email } = req.body;
+
+        // Encrypt the password
+        const passwordHash = await bcrpt.hash(password, 9);
+
+        // Create a new instance of user model
+        const user = new User({
+            firstName,
+            lastName,
+            email,
+            password: passwordHash
+        });
+        await user.save().then((user) => {
+            console.log("User saved successfully");
+            res.send(user);
+        }).catch((err) => {
+            console.error("Error while saving user", err);
+            res.status(400).send({ error: err.message });
+        });
+    }
+    catch (err) {
+        console.error("Error while creating user", err);
         res.status(400).send({ error: err.message });
-    });
+    }
 });
+
+app.post("/login",  async(req, res) => {
+    try {
+        const {email, password} = req.body;
+
+        const user = await User.findOne({email: email});
+        if(!user){
+            throw new Error("Invalid Credentials");
+        }
+
+        const isPasswordValid = await bcrpt.compare(password, user.password);
+
+        if(!isPasswordValid){
+            throw new Error("Invalid Credentials");
+        }
+        res.send("Login successful");
+    }
+    catch (err) {
+        console.error("Error while logging in", err);
+        res.status(400).send({ error: err.message });
+    }
+})
 
 app.get("/user", async (req, res)=>{
     const firstName = req.body.firstName;
