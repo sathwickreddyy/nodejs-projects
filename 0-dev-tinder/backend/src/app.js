@@ -60,17 +60,26 @@ app.delete("/user", async (req, res) => {
     }
 });
 
-app.patch("/user", async (req, res) => {
+app.patch("/user/:userId", async (req, res) => {
     try {
+
+        const ALLOWED_UPDATES = ["password", "age", "gender", "skills", "about"];
+        const userId = req.params.userId;
         const user = req.body;
-        const response = await User.findByIdAndUpdate({"_id": user.userId}, user, {
-            returnDocument: "after"
-        });
+
+        const isAllowed = Object.keys(user).every((k) => ALLOWED_UPDATES.includes(k));
+        if(!isAllowed) {
+            throw new Error("Update not allowed."+ " Allowed updates are " + ALLOWED_UPDATES);
+        }
+        const response = await User.findByIdAndUpdate({"_id": userId}, user, {
+            returnDocument: "after",
+            runValidators: true
+        })
         res.send(response);
     }
     catch (err) {
-        console.error("Error while updating user", err);
-        res.status(500).send({ error: "Error while updating user" });
+        console.error("Error while updating user", err.message);
+        res.status(400).send({ error: err.message });
     }
 })
 

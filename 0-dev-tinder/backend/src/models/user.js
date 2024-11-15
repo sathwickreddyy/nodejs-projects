@@ -1,4 +1,5 @@
 const mongoose= require("mongoose");
+const validator = require("validator");
 
 const userSchema = new mongoose.Schema({
     firstName: {
@@ -15,7 +16,13 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        trim: true
+        trim: true,
+        lowercase: true,
+        validate(value) {
+            if(!validator.isEmail(value)){
+                throw new Error("Invalid email");
+            }
+        }
     },
     password: {
         type: String,
@@ -26,9 +33,19 @@ const userSchema = new mongoose.Schema({
     },
     gender: {
         type: String,
+        validate(value) {
+            if(!["male", "female", "other"].includes(value)) {
+                throw new Error("Invalid gender");
+            }
+        }
     },
     photoURL: {
-        type: String
+        type: String,
+        validate(value){
+            if(!validator.isURL(value)){
+                throw new Error("Invalid photo URL");
+            }
+        }
     },
     description: {
         type: String
@@ -40,7 +57,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: "Please update your profile sections to show your skills and experience"
     }
-});
+}, { timestamps: true });
 
 const User = mongoose.model("User", userSchema);
 
