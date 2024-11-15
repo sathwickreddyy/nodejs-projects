@@ -14,7 +14,7 @@ app.post("/signup", async (req, res) => {
         res.send(user);
     }).catch((err) => {
         console.error("Error while saving user", err);
-        res.status(500).send({ error: "Error while saving user" });
+        res.status(400).send({ error: err.message });
     });
 });
 
@@ -22,7 +22,9 @@ app.get("/user", async (req, res)=>{
     const firstName = req.body.firstName;
     try
     {
-        const users = await User.find({ firstName: firstName });
+        const users = await User.find({ firstName: firstName }).catch((err) => {
+            console.error("Error while finding user", err);
+        });
         if(users.length === 0){
             res.status(404).send({ error: "User not found" });
         }
