@@ -3,10 +3,13 @@ const connectDB = require("./config/database");
 const { validateSignUpData } = require("./utils/validation");
 const User = require("./models/user");
 const bcrpt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.post("/signup", async (req, res) => {
     try {
@@ -26,7 +29,6 @@ app.post("/signup", async (req, res) => {
             password: passwordHash
         });
         await user.save().then((user) => {
-            console.log("User saved successfully");
             res.send(user);
         }).catch((err) => {
             console.error("Error while saving user", err);
@@ -53,11 +55,31 @@ app.post("/login",  async(req, res) => {
         if(!isPasswordValid){
             throw new Error("Invalid Credentials");
         }
+
+        const token = await jwt.sign({_id: user._id}, "Secret@Tinder$790");
+        res.cookie("token", token);
         res.send("Login successful");
     }
     catch (err) {
         console.error("Error while logging in", err);
         res.status(400).send({ error: err.message });
+    }
+})
+
+app.get("/profile", async (req, res) => {
+    try {
+        const {token} = req.cookies;
+        const decodedMessage = await jwt.verify(token, "Secret@Tinder$790");
+        const user_id = decodedMessage._id;
+        const user = await User.findById(user_id);
+        if (!user) {
+            res.status(400).send({error: "Please login before accessing profile"});
+        }
+        res.send(user);
+    }
+    catch (err) {
+        console.error("Error while getting profile", err);
+        res.status(400).send({ error: "Error while getting profile details: "+ err.message +". Please login again" });
     }
 })
 
