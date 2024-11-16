@@ -1,27 +1,30 @@
-const adminAuth = (req, res, next) => {
-    console.log("Admin auth middleware");
-    const token = "abc";
-    const isAdminAuthorized = token === "abc";
-    if (isAdminAuthorized) {
+const jwt = require("jsonwebtoken");
+const User = require("../models/user");
+
+const userAuth = async (req, res, next) => {
+    try {
+        const {token} = req.cookies;
+        if(!token) {
+            res.status(401).send({ error: "Unauthorized, please login" });
+            return;
+        }
+        const decodedMessage = await jwt.verify(token, "Secret@Tinder$790");
+
+        const user = await User.findById(decodedMessage._id);
+        if(!user) {
+            res.status(404).send("User not found");
+            return;
+        }
+        req._user = user;
+        console.log("User", user._id ,"Authenticated!");
         next();
-    } else {
-        res.status(401).send({ error: "Unauthorized" });
     }
-};
-
-
-const userAuth = (req, res, next) => {
-    console.log("User auth middleware");
-    const token = "abc";
-    const isUserAuthorized = token === "abc";
-    if (isUserAuthorized) {
-        next();
-    } else {
-        res.status(401).send({ error: "Unauthorized" });
+    catch (err) {
+        console.error("Error while authenticating user", err);
+        res.status(400).send({ error: err.message });
     }
 };
 
 module.exports = {
-    adminAuth,
     userAuth
 }

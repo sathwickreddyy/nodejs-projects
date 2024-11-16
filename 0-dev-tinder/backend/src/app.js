@@ -5,6 +5,7 @@ const User = require("./models/user");
 const bcrpt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
+const { userAuth } = require("./middlewares/auth");
 
 const app = express();
 
@@ -66,16 +67,9 @@ app.post("/login",  async(req, res) => {
     }
 })
 
-app.get("/profile", async (req, res) => {
+app.get("/profile", userAuth, async (req, res) => {
     try {
-        const {token} = req.cookies;
-        const decodedMessage = await jwt.verify(token, "Secret@Tinder$790");
-        const user_id = decodedMessage._id;
-        const user = await User.findById(user_id);
-        if (!user) {
-            res.status(400).send({error: "Please login before accessing profile"});
-        }
-        res.send(user);
+        res.send(req._user);
     }
     catch (err) {
         console.error("Error while getting profile", err);
@@ -102,7 +96,7 @@ app.get("/user", async (req, res)=>{
 
 })
 
-app.get("/feed", async (req, res) => {
+app.get("/feed", userAuth, async (req, res) => {
     try {
         const users = await User.find({});
         res.send(users);
@@ -113,7 +107,7 @@ app.get("/feed", async (req, res) => {
     }
 })
 
-app.delete("/user", async (req, res) => {
+app.delete("/user", userAuth ,async (req, res) => {
     try {
         const userId = req.body.userId;
         const response = await User.findByIdAndDelete({"_id": userId});
@@ -125,7 +119,7 @@ app.delete("/user", async (req, res) => {
     }
 });
 
-app.patch("/user/:userId", async (req, res) => {
+app.patch("/user/:userId", userAuth,async (req, res) => {
     try {
 
         const ALLOWED_UPDATES = ["password", "age", "gender", "skills", "about"];
