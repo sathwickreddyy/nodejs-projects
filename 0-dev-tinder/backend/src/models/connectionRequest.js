@@ -21,6 +21,15 @@ const connectionRequestSchema = new mongoose.Schema({
     timestamps: true
 });
 
+// middle ware before save method.
+connectionRequestSchema.pre("save", function (next) {
+    // Check if the fromUserId is same as toUserId
+    if(this.fromUserId.toString() === this.toUserId.toString()) {
+        throw new Error("From user id and to user id cannot be same");
+    }
+    next();
+})
+
 const ConnectionRequest = mongoose.model("ConnectionRequest", connectionRequestSchema);
 
 module.exports = ConnectionRequest;

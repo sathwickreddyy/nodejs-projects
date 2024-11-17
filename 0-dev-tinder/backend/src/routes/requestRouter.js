@@ -25,13 +25,6 @@ router.post("/request/send/:status/:toUserId", userAuth, async (req, res) => {
             })
         }
 
-        // user can't send request to himself
-        if(fromUserId.equals(toUserId)) {
-            return res.status(400).json({
-                message: "Invalid Request: You can't send request to yourself"
-            })
-        }
-
         // check if connection request already exists
         const connectionRequestExist = await ConnectionRequest.findOne({
             $or:[
