@@ -29,17 +29,31 @@
 
 ## API Design { REST API }
 
-POST /signup
-POST /login
-GET /profile
-POST /profile
-PATCH /profile
-DELETE /profile
-POST /send_connection_request 
-            / \
-      ignore   interested
-POST /reviewRequest
-            / \
-         accept reject
-GET /requests
-GET /connections
+**authRouter**
+- POST /login
+- POST /logout
+- POST /signup
+
+**profileRouter**
+- GET /profile/view
+- PATCH /profile/edit
+- PATCH /profile/password
+- DELETE /profile
+
+```
+ send_connection_request 
+     /       |       \
+ ignore   interested   accepted
+```
+
+**connectionRequestRouter**
+- POST /request/send/interested/:userId
+- POST /request/send/ignored/:userId
+- POST /request/review/accepted/:userId
+- POST /request/review/rejected/:userId
+
+**userRouter**
+- GET /feed (fetches the other users...)
+- GET /connections
+- GET /requests/received
+- GET /requests/sent
