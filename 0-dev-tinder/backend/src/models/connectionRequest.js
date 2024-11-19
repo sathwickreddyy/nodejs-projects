@@ -30,6 +30,9 @@ connectionRequestSchema.pre("save", function (next) {
     next();
 })
 
+// Creating a compound index for faster search
+connectionRequestSchema.index({ fromUserId: 1, toUserId: 1});
+
 const ConnectionRequest = mongoose.model("ConnectionRequest", connectionRequestSchema);
 
 module.exports = ConnectionRequest;

@@ -48,8 +48,7 @@
 
 **connectionRequestRouter**
 - POST /request/send/:status/:userId
-- POST /request/review/accepted/:userId
-- POST /request/review/rejected/:userId
+- POST /request/review/:status/:connectionRequestId
 
 **userRouter**
 - GET /feed (fetches the other users...)
