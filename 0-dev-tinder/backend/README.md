@@ -55,3 +55,11 @@
 - GET /connections
 - GET /requests/received
 - GET /requests/sent
+
+### Thought Process of API Design
+
+- POST
+  - Must verify and validate every data for this request before writing to database
+  - Must be careful what is required for return.
+- GET 
+  - We must make sure, only the data is allowed and is authorized to view that
