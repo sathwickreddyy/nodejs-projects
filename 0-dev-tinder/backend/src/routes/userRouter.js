@@ -72,6 +72,11 @@ router.get("/user/connections", userAuth, async (req, res) => {
 router.get("/feed", userAuth, async (req, res) => {
     try {
         const loggedInUser = req._user;
+
+        let page = parseInt(req.query.page) || 1;
+        page = page > 1 ? page : 1; // avoid zero or negative pages
+        let limit = parseInt(req.query.limit) || 10;
+        limit = limit > 50 ? 50 : limit > 0 ? limit : 10;
         const USER_SAFE_DATA = ["firstName", "lastName", "photoUrl", "age", "skills", "gender"];
 
         /**
@@ -113,7 +118,7 @@ router.get("/feed", userAuth, async (req, res) => {
                 { _id: { $nin: Array.from(hideUsersFromFeed) } },
                 { _id: { $ne: loggedInUser._id } }
             ]
-        }).select(USER_SAFE_DATA);
+        }).select(USER_SAFE_DATA).skip((page - 1) * limit).limit(limit);
 
         res.status(200).json({
             "message": "Feed fetched successfully",
