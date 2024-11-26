@@ -55,7 +55,7 @@ router.post("/login",  async(req, res) => {
         res.cookie("token", token, {
             expires: new Date(Date.now() + 86400000),
         });
-        res.send("Login successful");
+        res.send(user);
     }
     catch (err) {
         console.error("Error while logging in", err);
