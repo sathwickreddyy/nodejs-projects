@@ -25,7 +25,10 @@ router.patch("/profile/edit", userAuth, async (req, res) => {
         const currentUser = req._user;
         Object.keys(req.body).forEach((key) => (currentUser[key] = req.body[key]));
         await currentUser.save();
-        res.send(`${currentUser.firstName}, your profile Updated Successful`);
+        res.send({
+            "message": `${currentUser.firstName}, your profile Updated Successful`,
+            "data": currentUser
+        });
     }
     catch (err) {
         console.error("Error while editing profile", err);

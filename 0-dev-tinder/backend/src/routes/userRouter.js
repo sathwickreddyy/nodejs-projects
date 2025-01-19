@@ -14,7 +14,7 @@ router.get("/user/requests/received", userAuth, async (req, res) => {
         const connectionRequests = await ConnectionRequest.find({
             toUserId: loggedInUser._id,
             status: "interested"
-        }).populate("fromUserId", ["firstName", "lastName", "photoUrl"]); // With the help of references we can select the required fields of the other collection.
+        }).populate("fromUserId", ["firstName", "lastName", "photoURL"]); // With the help of references we can select the required fields of the other collection.
 
         res.status(200).json({
             "message": "Connection requests fetched successfully",
@@ -28,7 +28,7 @@ router.get("/user/requests/received", userAuth, async (req, res) => {
 
 router.get("/user/connections", userAuth, async (req, res) => {
     try{
-        const USER_SAFE_DATA = ["firstName", "lastName", "photoUrl", "age", "skills", "gender"];
+        const USER_SAFE_DATA = ["firstName", "lastName", "photoURL", "age", "skills", "gender"];
         const loggedInUser = req._user;
         /**
          * Say I am user A
@@ -77,7 +77,7 @@ router.get("/feed", userAuth, async (req, res) => {
         page = page > 1 ? page : 1; // avoid zero or negative pages
         let limit = parseInt(req.query.limit) || 10;
         limit = limit > 50 ? 50 : limit > 0 ? limit : 10;
-        const USER_SAFE_DATA = ["firstName", "lastName", "photoUrl", "age", "skills", "gender"];
+        const USER_SAFE_DATA = ["firstName", "lastName", "photoURL", "age", "skills", "gender"];
 
         /**
          * Say A is loggedIn User

@@ -6,12 +6,15 @@ function App() {
 
   const callApi = async () => {
     try {
-      // Make an HTTPS request to the Spring Boot server
+      // Make an HTTPS request to the Spring Boot server with authentication
       const response = await fetch('https://localhost:8443/hello', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': 'Basic ' + btoa('admin:admin123'), // Base64 encode username:password
         },
+        mode: 'cors', // Ensure CORS mode is set
+        credentials: 'include', // Include credentials in the request
       });
 
       if (!response.ok) {
@@ -25,6 +28,9 @@ function App() {
       setError('Failed to fetch data from server.');
     }
   };
+
+
+
 
   return (
       <div className="App">
