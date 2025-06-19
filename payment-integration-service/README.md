@@ -43,7 +43,6 @@ Users {
     age: number,
     password: string,
     photoUrl: string
-    skills: [string],
     location: string,
     gender: string,
     about: string
