@@ -19,6 +19,8 @@ Orders {
     shippingAddress: string,
     billingAddress: string,
     status: string [Payment Pending, Order Placed, Order Shipped, Order Delivered, Failed]
+    createdAt: Date,
+    updatedAt: Date,
 }
 
 Products {
@@ -29,6 +31,8 @@ Products {
     imageUrl: string,
     quantity: number,
     providerId: string (foreign key & create index on this field)
+    createdAt: Date,
+    updatedAt: Date,
 }
 
 Users {
@@ -43,10 +47,29 @@ Users {
     location: string,
     gender: string,
     about: string
-    cart: {
-        products: Products, (pre-populate or pass the Id's')
+    cartSummary: { // prefer keeping some cart reference in the Users collection for quick access
+        cartId: string // Reference to separate cart document
+        itemCount: number,
+        lastUpdated: Date,
     }
+    createdAt: Date,
+    updatedAt: Date,
 }
+
+Carts {
+    _id: string,
+    userId: string, // foreign key & index
+    items: [{
+        productId: string,
+        quantity: number,
+        addedAt: Date,
+        priceAtAdd: number // Snapshot for price consistency
+    }],
+    createdAt: Date,
+    updatedAt: Date,
+    expiresAt: Date // Auto-cleanup abandoned carts
+}
+
 
 PaymentRequest {
     paymentId: string,
@@ -56,6 +79,8 @@ PaymentRequest {
     currency: string, // USD, INR, EUR
     paymentMode: [string],
     status: string // success or failure or pending
+    createdAt: Date,
+    updatedAt: Date,
 }
 ```
 
